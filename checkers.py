@@ -88,33 +88,64 @@ class ConnectFourGame(Game) :
     def undo(self):
         return self.pervious_state
     
-    def get_moves_for_piece(self, state, team, piece_index):
+    def get_moves_for_piece(self, state, piece_loc): # piece_loc should be a touple containing 2 ints
         valid_moves = []
+        team = state[piece_loc[0]][piece_loc[1]]
         # if piece is red
         if team == 'r':
-            # piece = self.red_pieces[piece_index]
+            # up-right diagnal
+            if self.is_valid_location(state, piece_loc[0]+1, piece_loc[1]+1) and \
+                    state[piece_loc[0]+1][piece_loc[1]+1] == '.': # in bounds and empty
+                valid_moves.append((piece_loc[0]+1, piece_loc[1]+1))
+            # up-right diagnal jump
+            if state[piece_loc[0]+1][piece_loc[1]+1] == self.getEnemyPlayer and \
+                    self.is_valid_location(state, piece_loc[0]+2, piece_loc[1]+2) and \
+                    state[piece_loc[0]+2][piece_loc[1]+2] == '.': # next space is enemy, double is in bounds, double is empty
+                valid_moves.append((piece_loc[0]+2, piece_loc[1]+2))
+
+            # up-left diagnal
+            if self.is_valid_location(state, piece_loc[0]+1, piece_loc[1]-1) and \
+                    state[piece_loc[0]+1][piece_loc[1]-1] == '.': # in bounds and empty
+                valid_moves.append((piece_loc[0]+1, piece_loc[1]-1))
+            # up-left diagnal jump
+            if state[piece_loc[0]+1][piece_loc[1]-1] == self.getEnemyPlayer and \
+                    self.is_valid_location(state, piece_loc[0]+2, piece_loc[1]-2) and \
+                    state[piece_loc[0]+2][piece_loc[1]-2] == '.': # next space is enemy, double is in bounds, double is empty
+                valid_moves.append((piece_loc[0]+2, piece_loc[1]-2))
+
+
             # if king
-            if state[piece_index[0]][piece_index[1]] == team.upper():
-                # up-right diagnal
-                if self.is_valid_location(state, piece_index[0]+1, piece_index[1]+1) and \
-                        state[piece_index[0]+1][piece_index[1]+1] != team: # in bounds and not same team
-                    valid_moves.append((piece_index[0]+1, piece_index[1]+1))
-                    # see if you can jump
-                if state[piece_index[0]+1][piece_index[1]+1] == self.getEnemyPlayer and \
-                        self.is_valid_location(state, piece_index[0]+2, piece_index[1]+2) and \
-                        state[piece_index[0]+2][piece_index[1]+2] == '.': # next space is enemy, double is in bounds, double is empty
-                    valid_moves.append((piece_index[0]+2, piece_index[1]+2))
+            if state[piece_loc[0]][piece_loc[1]] == team.upper():
+                # down-right diagnal
+                if self.is_valid_location(state, piece_loc[0]-1, piece_loc[1]+1) and \
+                        state[piece_loc[0]-1][piece_loc[1]+1] == '.': # in bounds and empty
+                    valid_moves.append((piece_loc[0]-1, piece_loc[1]+1))
+                # down-right diagnal jump
+                if state[piece_loc[0]-1][piece_loc[1]+1] == self.getEnemyPlayer and \
+                        self.is_valid_location(state, piece_loc[0]+2, piece_loc[1]+2) and \
+                        state[piece_loc[0]-2][piece_loc[1]+2] == '.': # next space is enemy, double is in bounds, double is empty
+                    valid_moves.append((piece_loc[0]-2, piece_loc[1]+2))
+
+                # down-left diagnal
+                if self.is_valid_location(state, piece_loc[0]-1, piece_loc[1]-1) and \
+                        state[piece_loc[0]-1][piece_loc[1]-1] == '.': # in bounds and empty
+                    valid_moves.append((piece_loc[0]-1, piece_loc[1]-1))
+                # down-left diagnal jump
+                if state[piece_loc[0]-1][piece_loc[1]-1] == self.getEnemyPlayer and \
+                        self.is_valid_location(state, piece_loc[0]-2, piece_loc[1]-2) and \
+                        state[piece_loc[0]-2][piece_loc[1]-2] == '.': # next space is enemy, double is in bounds, double is empty
+                    valid_moves.append((piece_loc[0]-2, piece_loc[1]-2))
 
 
 
-                    self.move_piece(state, piece_index[0]+1, piece_index[1]+1,team)
+                    self.move_piece(state, piece_loc[0]+1, piece_loc[1]+1,team)
 
 
         # if piece is black  
         else:
-            # piece = self.black_pieces[piece_index]
+            # piece = self.black_pieces[piece_loc]
             # if king
-            if state[piece_index[0]][piece_index[1]] == piece_index.upper():
+            if state[piece_loc[0]][piece_loc[1]] == piece_loc.upper():
                 for pie in self.red_pieces:
                     pass
 
@@ -124,7 +155,8 @@ class ConnectFourGame(Game) :
         #         return r
         # return NUMBER_OF_ROWS
 
-    def actions(self, state, team, piece):
+    # choose a piece
+    def actions(self, state, team):
         # returns list of numbers corresponding to possible moves
         valid_locations = []
         for col in range(NUMBER_OF_COLS):
